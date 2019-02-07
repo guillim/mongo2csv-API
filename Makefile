@@ -1,4 +1,4 @@
-export APP=mongo2csv-API
+export APP=mongo2csv-api
 export DC_PREFIX= $(shell pwd)/docker-compose
 
 #other variable definition
