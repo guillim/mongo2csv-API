@@ -17,6 +17,28 @@ npm run dev
 ```
 Here you go ! Follow this link to see it working: http://localhost:8000/status
 
+
+Second method, for the ones who have docker installed:  
+
+## Setup (with Docker):
+In your terminal, type:  
+```
+git clone https://github.com/guillim/mongo2csv-API.git mongo2csv-API && cd mongo2csv-API
+```  
+
+Then configure your database:  
+In the /config folder, rename _db_example.js_ into _db.js_ and fill with your credentials / IPs... Some examples are commented inside this file.
+## Run (with Docker):
+```bash
+make up
+```
+Here you go ! Follow this link to see it working: http://localhost:8000/status
+
+If you want to stop:
+```bash
+make down
+```
+
 ## MongoDB Configuration if you haven't any:
 1. Go to https://mlab.com/ and create a free account (you have 500 Mo for free, enough for testing ! )
 2. Create a database, and remember the name you chose
