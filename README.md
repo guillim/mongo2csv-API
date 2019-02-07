@@ -15,8 +15,7 @@ In the /config folder, rename _db_example.js_ into _db.js_ and fill with your cr
 ```bash
 npm run dev
 ```
-Here you go ! Follow this link to see it working: http://localhost:8000/status
-
+Here you go ! Follow this link to see it working: [http://localhost:8000/status](http://localhost:8000/status)
 
 Second method, for the ones who have docker installed:  
 
@@ -32,7 +31,7 @@ In the /config folder, rename _db_example.js_ into _db.js_ and fill with your cr
 ```bash
 make up
 ```
-Here you go ! Follow this link to see it working: http://localhost:8000/status
+Here you go ! Follow this link to see it working: [http://localhost:8000/status](http://localhost:8000/status)
 
 If you want to stop:
 ```bash
@@ -50,6 +49,11 @@ make down
 ## Customise your query to MongoDB
 I wrote an example of  MongoDB query in the file note_routes.js
 To fit you database Model, simply edit this file, and here you go !
+
+In my example, here is how it works:
+When I want to query the collection "results" with a parameter called postid equal to "fds4fjds657" and a second parameter equals to 45, I simply go to this route. Done  
+[http://localhost:8000/getcsv/results/fds4fjds657/45](http://localhost:8000/getcsv/results/fds4fjds657/45)
+
 
 ----------------------------
 
