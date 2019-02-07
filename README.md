@@ -54,6 +54,15 @@ In my example, here is how it works:
 When I want to query the collection "results" with a parameter called postid equal to "fds4fjds657" and a second parameter equals to 45, I simply go to this route. Done  
 [http://localhost:8000/getcsv/results/fds4fjds657/45](http://localhost:8000/getcsv/results/fds4fjds657/45)
 
+It will simply do:  
+```
+db.collection('results').find({
+  postid:'fds4fjds657',
+  "crawlerFinishedAt": { $gt: new Date(new Date().setDate(new Date().getDate()-45))}
+})
+```
+Like you can see in the note_routes file  
+
 
 ----------------------------
 
