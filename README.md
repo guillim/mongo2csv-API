@@ -71,6 +71,14 @@ If you have big files to send, maybe you would like to upload them through wetra
 2. Rename api_keys_example.js into api_keys.js and fill with you own API key
 3. Simply use this route [http://localhost:8000/getcsvwetransfer/results/fds4fjds657/45](http://localhost:8000/getcsvwetransfer/results/fds4fjds657/45)
 
+Also, if your file is too big, it may take a lot of time. The best solution is to get notified by email when the upload is finished. Then you can use this route instead:  
+[http://localhost:8000/getcsvwetransferemail/results/fds4fjds657/45/my@email.com](http://localhost:8000/getcsvwetransferemail/results/fds4fjds657/45/my@email.com)
+
+Note: Similar to what we did before, you will have to rename email_example.js into email.js and fill with you own credentials. It is configured to work with zoho and gmail, but could work for Outlook with very little change (see [here](https://ourcodeworld.com/articles/read/264/how-to-send-an-email-gmail-outlook-and-zoho-using-nodemailer-in-node-js) )
+
+
+
+
 Your good to go !
 ----------------------------
 
