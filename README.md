@@ -64,6 +64,14 @@ db.collection('results').find({
 Like you can see in the note_routes file  
 
 
+
+## BIG files: use the wetransfer option
+If you have big files to send, maybe you would like to upload them through wetransfer.
+1. Create you API key at [wetransfer](https://developers.wetransfer.com/)
+2. Rename api_keys_example.js into api_keys.js and fill with you own API key
+3. Simply use this route [http://localhost:8000/getcsvwetransfer/results/fds4fjds657/45](http://localhost:8000/getcsvwetransfer/results/fds4fjds657/45)
+
+Your good to go !
 ----------------------------
 
 
