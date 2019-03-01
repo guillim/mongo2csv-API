@@ -86,3 +86,15 @@ Your good to go !
 
 ### Thanks [Scott](https://github.com/scottdomes)
 This was built following the [excellent article](https://medium.freecodecamp.org/building-a-simple-node-js-api-in-under-30-minutes-a07ea9e390d2)
+
+
+### note for deployment on remote server using docker:
+Once you have cloned your repo on your remote server, and you are running it with docker, you may need to connect it to anothe docker instance.
+Shortly, you can see all docker networks available using
+`docker network ls`
+then you can inspect which containers are connected to each network using: (here the network is called `mongo2csv-api`)
+`docker network inspect mongo2csv-api` 
+If two containers want to communicate, the both must appear in the "containers" section 
+
+Let's say you have a container called "gomanual" that isn't part of your "mongo2csv-api" network, then simply type:
+`docker network connect mongo2csv-api gomanual`
