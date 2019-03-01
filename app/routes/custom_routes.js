@@ -25,8 +25,7 @@ module.exports = function(app, db) {
         "debugInfo":0
       }
     })
-    // .limit(500000)
-    .limit(5)
+    .limit(500000)
     .sort({rowCreatedAt:-1})
     .toArray(function(err,result) {
       if (err) throw err;
