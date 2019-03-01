@@ -100,8 +100,8 @@ module.exports = function(app, db) {
         // in the most suitable part of your code
         const wtClient = await createWTClient(api_keys.wetransfer);
 
-        // const content = Buffer.from('Look ma, a transfer!');
         const content = Buffer.from(result);
+        if(content.length <= 1) {res.send('ERROR: content.length <= 1 - contact admin')}
         const transfer = await wtClient.transfer.create({
           message: 'From dontgomanual: Thanks you for using our service!',
           files: [
@@ -174,8 +174,8 @@ module.exports = function(app, db) {
         // in the most suitable part of your code
         const wtClient = await createWTClient(api_keys.wetransfer);
 
-        // const content = Buffer.from('Look ma, a transfer!');
         const content = Buffer.from(result);
+        if(content.length <= 1) {res.send('ERROR: content.length <= 1 - contact admin')}
         const transfer = await wtClient.transfer.create({
           message: 'From dontgomanual: Thanks you for using our service!',
           files: [
