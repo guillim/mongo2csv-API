@@ -1,36 +1,4 @@
 const utils = require('../../lib/utils.js');
-const email_utils = require('../../lib/email_utils.js');
-const createWTClient = require('@wetransfer/js-sdk');
-const api_keys       = require('../../config/api_keys');
-
-
-const wetransferProcess = async function(finalResults,name,email,res){
-    const wtClient = await createWTClient(api_keys.wetransfer);
-    const content = await Buffer.from(finalResults);
-
-    if(content.length <= 1) {res.send('ERROR: content.length <= 1')}
-    const transfer = await wtClient.transfer.create({
-      message: 'From dontgomanual: Thanks you for using our service!',
-      files: [
-        {
-          name: name,
-          size: content.length,
-          content: content
-        }
-      ]
-    });
-
-    let emailProcessStatus = email_utils.sendEmail({
-      to:decodeURI(email),
-      link:transfer.url
-    })
-
-    let responseObj = {}
-    responseObj.status = emailProcessStatus
-    responseObj.content = transfer.url
-
-    res.send(responseObj)
-}
 
 module.exports = function(app, db) {
   app.get('/getcsvwetransferemail_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
@@ -62,9 +30,10 @@ module.exports = function(app, db) {
     let keywords = await getKeywords();
     let utils_positionToCTRs = await getUtils(post);
 
+    if(!post) {res.send({status : 'aborted', msg:'post undefined'})}
     console.log('post.owner:',post.owner);
-    console.log('getKeywords:',keywords);
-    console.log('utils_positionToCTRs:',utils_positionToCTRs);
+    // console.log('getKeywords:',keywords);
+    // console.log('utils_positionToCTRs:',utils_positionToCTRs);
     let message = 'Not set up'
 
 
@@ -126,10 +95,10 @@ module.exports = function(app, db) {
           if(fullResultobj.bool){
             let resultFortransfer =	utils.fileParse(fullResultobj.collection)
             //now we launch the wetransfer funcitonality
-            wetransferProcess(resultFortransfer,'dontgomanual_'+req.params.id+'.csv',req.params.email,res)
+            utils.wetransferProcess(resultFortransfer,'dontgomanual_'+req.params.id+'.csv',req.params.email,res)
           }else{
             console.log('inner inner else');
-            wetransferProcess('problem in the treatment','dontgomanual_'+req.params.id+'.csv',req.params.email,res)
+            utils.wetransferProcess('problem in the treatment','dontgomanual_'+req.params.id+'.csv',req.params.email,res)
           }
 
       }else{  console.log('result is empty or undefined');
