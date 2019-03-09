@@ -33,14 +33,15 @@ const wetransferProcess = async function(finalResults,name,email,res){
 }
 
 module.exports = function(app, db) {
-  app.get('/getcsvwetransferemail_customRoute/:collection/:id/:param/:email', async (req, res) => {
+  app.get('/getcsvwetransferemail_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
     if(!req.params.collection) throw 'collection required'
     if(!req.params.id) throw 'id required'
-    if(!req.params.param) throw 'param required'
+    if(!req.params.param1) throw 'param1 oldest required'
+    if(!req.params.param2) throw 'param2 recent required'
     if(!req.params.email) throw 'email required'
 
     let debut = new Date().getTime()
-    console.log("mongo2csv-API - id:",req.params.id, ' param=',req.params.param, ' collection=',req.params.collection, ' email=',req.params.email)
+    console.log("mongo2csv-API - id:",req.params.id, ' param1=',req.params.param1,' param2=',req.params.param2, ' collection=',req.params.collection, ' email=',req.params.email)
 
 
 
@@ -71,7 +72,7 @@ module.exports = function(app, db) {
     db.collection(req.params.collection)
     .find({
       postid:req.params.id,
-      "crawlerFinishedAt": { $gt: new Date(new Date().setDate(new Date().getDate()-req.params.param))}
+      "crawlerFinishedAt": { $gte: new Date(new Date().setDate(new Date().getDate()-req.params.param1)), $lte: new Date(new Date().setDate(new Date().getDate()-req.params.param2)) }
     },
     {
       fields:{
