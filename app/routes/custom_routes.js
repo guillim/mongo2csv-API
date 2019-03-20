@@ -1,4 +1,5 @@
 const utils = require('../../lib/utils.js');
+const utilsStream = require('../../lib/utilsStream.js');
 
 module.exports = function(app, db) {
   app.get('/getcsvwetransferemail_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
@@ -105,5 +106,71 @@ module.exports = function(app, db) {
       }
       console.log((new Date().getTime() - debut) / 1000  );
     });
+  }),
+
+
+
+  app.get('/getcsvwetransferemailStream_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
+      if(!req.params.collection) throw 'collection required'
+      if(!req.params.id) throw 'id required'
+      if(!req.params.param1) throw 'param1 oldest required'
+      if(!req.params.param2) throw 'param2 recent required'
+      if(!req.params.email) throw 'email required'
+
+      let debut = new Date().getTime()
+      console.log("mongo2csv-API - id:",req.params.id, ' param1=',req.params.param1,' param2=',req.params.param2, ' collection=',req.params.collection, ' email=',req.params.email)
+
+
+
+      //here we define two funcitons to get some data
+      const getPost = async function(){ return await db.collection('posts').findOne({_id:req.params.id}) }
+      //needs to be here otherwise notenough time for keywords to use post.owner
+      let post = await getPost();
+
+
+      const getKeywords = async function(){ return await  db.collection('keywords').find({postid:req.params.id}).toArray() }
+      const getUtils = async function(p){  return await db.collection('utils').findOne({ $or: [{otherUsers:p.owner},{owner:p.owner}]})   }
+      // const getPositionToCTRs = async function(p){  return await db.collection('utils').findOne({ $or: [{otherUsers:p.owner},{owner:p.owner}]}).positionToCTRs    }
+
+
+      // HERE WE BEGIN
+
+      //we fetch all needed data for all results
+      let keywords = await getKeywords();
+      let utils_positionToCTRs = await getUtils(post);
+
+      if(!post) {res.send({status : 'aborted', msg:'post undefined'})}
+      console.log('post.owner:',post.owner);
+      // console.log('getKeywords:',keywords);
+      // console.log('utils_positionToCTRs:',utils_positionToCTRs);
+      let message = 'Not set up'
+
+
+
+      db.collection(req.params.collection)
+      .find({
+        postid:req.params.id,
+        "crawlerFinishedAt": { $gte: new Date(new Date().setDate(new Date().getDate()-req.params.param1)), $lte: new Date(new Date().setDate(new Date().getDate()-req.params.param2)) }
+      },
+      {
+        fields:{
+          // "postid":0,
+          "rowCreatedAt":0,
+          "debugInfo":0
+        }
+      })
+      .limit(500000)
+      // .limit(5)
+      .sort({rowCreatedAt:-1})
+      .toArray( async function(err,results) {
+        if (err) throw err;
+        if(results && results.length > 0) {
+          utilsStream.fullProcess(results,post,keywords,utils_positionToCTRs,message,res,req)
+          res.send('result processing, you wil revceive an email when finished at' + req.params.email)
+        }else{  console.log('result is empty or undefined'); res.send('ERROR: file too short. is it empty?')
+        }
+        console.log((new Date().getTime() - debut) / 1000  );
+      });
   })
+
 };
