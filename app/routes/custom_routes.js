@@ -2,7 +2,7 @@ const utils = require('../../lib/utils.js');
 const utilsStream = require('../../lib/utilsStream.js');
 
 module.exports = function(app, db) {
-  app.get('/getcsvwetransferemail_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
+  app.get('/getcsvwetransferemailNoStream_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
     if(!req.params.collection) throw 'collection required'
     if(!req.params.id) throw 'id required'
     if(!req.params.param1) throw 'param1 oldest required'
@@ -110,7 +110,7 @@ module.exports = function(app, db) {
 
 
 
-  app.get('/getcsvwetransferemailStream_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
+  app.get('/getcsvwetransferemail_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
       if(!req.params.collection) throw 'collection required'
       if(!req.params.id) throw 'id required'
       if(!req.params.param1) throw 'param1 oldest required'
@@ -162,15 +162,16 @@ module.exports = function(app, db) {
       .limit(500000)
       // .limit(5)
       .sort({rowCreatedAt:-1})
-      .toArray( async function(err,results) {
+      .toArray( function(err,results) {
         if (err) throw err;
         if(results && results.length > 0) {
           utilsStream.fullProcess(results,post,keywords,utils_positionToCTRs,message,res,req)
-          res.send('result processing, you wil revceive an email when finished at' + req.params.email)
-        }else{  console.log('result is empty or undefined'); res.send('ERROR: file too short. is it empty?')
+        }else{  console.log('result is empty or undefined');
         }
         console.log((new Date().getTime() - debut) / 1000  );
+        return true
       });
+      res.send('result processing, you will soon receive an email at ' + req.params.email)
   })
 
 };
