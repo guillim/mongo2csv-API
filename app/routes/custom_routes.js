@@ -165,7 +165,7 @@ module.exports = function(app, db) {
       .toArray( function(err,results) {
         if (err) throw err;
         if(results && results.length > 0) {
-          utilsStream.fullProcess(results,post,keywords,utils_positionToCTRs,message,res,req)
+          utilsStream.fullProcess(results,post,keywords,utils_positionToCTRs,message,res,req,db)
         }else{  console.log('result is empty or undefined');
         }
         console.log((new Date().getTime() - debut) / 1000  );
