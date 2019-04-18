@@ -3,3 +3,5 @@ config/api_keys.js
 config/email.js
 node_modules
 package-lock.json
+app/tmp/*
+!app/tmp/README.md
