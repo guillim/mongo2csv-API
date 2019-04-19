@@ -168,7 +168,7 @@ module.exports = function(app, db) {
           utilsStream.fullProcess(results,post,keywords,utils_positionToCTRs,message,res,req,db)
         }else{  console.log('result is empty or undefined');
         }
-        console.log((new Date().getTime() - debut) / 1000  );
+        console.log('Time - collection find: ' ,(new Date().getTime() - debut) / 1000  );
         return true
       });
       res.send('result processing, you will soon receive an email at ' + req.params.email)
