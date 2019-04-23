@@ -1,5 +1,7 @@
 const utils = require('../../lib/utils.js');
 const utilsStream = require('../../lib/utilsStream.js');
+const fs = require('fs-extra');
+const JSONStream = require('JSONStream')
 
 module.exports = function(app, db) {
   app.get('/getcsvwetransferemailNoStream_customRoute/:collection/:id/:param1/:param2/:email', async (req, res) => {
@@ -146,8 +148,10 @@ module.exports = function(app, db) {
       let message = 'Not set up'
 
 
+      const jsoniniFullPath = './app/tmp/' + new Date().getTime() + '.jsonini'
+      const output = fs.createWriteStream(jsoniniFullPath, { encoding: 'utf8' });
 
-      db.collection(req.params.collection)
+      let processor = db.collection(req.params.collection)
       .find({
         postid:req.params.id,
         "crawlerFinishedAt": { $gte: new Date(new Date().setDate(new Date().getDate()-req.params.param1)), $lte: new Date(new Date().setDate(new Date().getDate()-req.params.param2)) }
@@ -162,15 +166,13 @@ module.exports = function(app, db) {
       .limit(500000)
       // .limit(5)
       .sort({rowCreatedAt:-1})
-      .toArray( function(err,results) {
-        if (err) throw err;
-        if(results && results.length > 0) {
-          utilsStream.fullProcess(results,post,keywords,utils_positionToCTRs,message,res,req,db)
-        }else{  console.log('result is empty or undefined');
-        }
-        console.log('Time - collection find: ' ,(new Date().getTime() - debut) / 1000  );
-        return true
-      });
+      .stream()
+      .pipe(JSONStream.stringify() )
+      .pipe(output)
+
+      processor.on('finish', () => {   utilsStream.fullProcess(jsoniniFullPath,post,keywords,utils_positionToCTRs,message,res,req,db)  });
+      processor.on('error', (err) => console.log('error in jsoniniFullPath',err) );
+
       res.send('result processing, you will soon receive an email at ' + req.params.email)
   })
 
