@@ -20,6 +20,7 @@ module.exports = function(app, db) {
       //needs to be here otherwise notenough time for keywords to use post.owner
       let post = await getPost();
 
+      if(!post) {res.send({status : 'aborted', msg:'post undefined'})}
 
       const getKeywords = async function(){ return await  db.collection('keywords').find({postid:req.params.id}).toArray() }
       const getUtils = async function(p){  return await db.collection('utils').findOne({ $or: [{otherUsers:p.owner},{owner:p.owner}]})   }
@@ -32,8 +33,7 @@ module.exports = function(app, db) {
       let keywords = await getKeywords();
       let utils_positionToCTRs = await getUtils(post);
 
-      if(!post) {res.send({status : 'aborted', msg:'post undefined'})}
-      console.log('post.owner:',post.owner);
+      // console.log('post.owner:',post.owner);
       // console.log('getKeywords:',keywords);
       // console.log('utils_positionToCTRs:',utils_positionToCTRs);
       let message = 'Not set up'
@@ -42,21 +42,58 @@ module.exports = function(app, db) {
       const jsoniniFullPath = './app/tmp/' + new Date().getTime() + '.jsonini'
       const output = fs.createWriteStream(jsoniniFullPath, { encoding: 'utf8' });
 
-      let processor = db.collection(req.params.collection)
-      .find({
-        postid:req.params.id,
-        "crawlerFinishedAt": { $gte: new Date(new Date().setDate(new Date().getDate()-req.params.param1)), $lte: new Date(new Date().setDate(new Date().getDate()-req.params.param2)) }
-      },
-      {
-        fields:{
-          // "postid":0,
-          "rowCreatedAt":0,
-          "debugInfo":0
+      const pipeline = [
+        {
+          $match:{
+            postid:req.params.id,
+            "crawlerFinishedAt": {
+              $gte: new Date(new Date().setDate(new Date().getDate()-req.params.param1)),
+              $lte: new Date(new Date().setDate(new Date().getDate()-req.params.param2))
+            }
+          }
+        },
+        {
+          $lookup: {
+              "from" : "productResults",
+              "localField" : "c04_asin",
+              "foreignField" : "p04_code",
+              "as" : "details"
+          }
+        },
+        {
+          $unwind: {
+              path : "$details",
+              preserveNullAndEmptyArrays : true
+          }
+        },
+        {
+          $project: {
+            "details._id": 0,
+            "details.crawlerFinishedAt": 0,
+            "details.p03_marketplaceName": 0,
+            "details.p04_code": 0,
+            "details.url": 0,
+            "rowCreatedAt": 0,
+            "_id": 0,
+            "url": 0,
+            "postid": 0,
+            "details.rowCreatedAt": 0,
+            "debugInfo": 0
+           }
+        },
+        {
+          $sort: { c01_keyword: 1}
         }
-      })
+      ];
+
+      let processor = db.collection(req.params.collection)
+      .aggregate(
+        pipeline,
+        {
+           cursor: { batchSize: 0 }
+        })
       .limit(500000)
       // .limit(5)
-      .sort({rowCreatedAt:-1})
       .stream()
       .pipe(JSONStream.stringify() )
       .pipe(output)
