@@ -42,6 +42,7 @@ module.exports = function(app, db) {
       const jsoniniFullPath = './app/tmp/' + new Date().getTime() + '.jsonini'
       const output = fs.createWriteStream(jsoniniFullPath, { encoding: 'utf8' });
 
+      // we cannot sort here the result because it takes more than 100 longer
       const pipeline = [
         {
           $match:{
@@ -80,9 +81,6 @@ module.exports = function(app, db) {
             "details.rowCreatedAt": 0,
             "debugInfo": 0
            }
-        },
-        {
-          $sort: { c01_keyword: 1}
         }
       ];
 
