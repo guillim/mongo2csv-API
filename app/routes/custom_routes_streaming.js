@@ -47,7 +47,7 @@ module.exports = function(app, db) {
         {
           $match:{
             postid:req.params.id,
-            "crawlerFinishedAt": {
+            crawlerFinishedAt: {
               $gte: new Date(new Date().setDate(new Date().getDate()-req.params.param1)),
               $lte: new Date(new Date().setDate(new Date().getDate()-req.params.param2))
             }
@@ -79,11 +79,17 @@ module.exports = function(app, db) {
             "url": 0,
             "postid": 0,
             "details.rowCreatedAt": 0,
-            "debugInfo": 0
+            "debugInfo": 0,
+            "details.p08_description1": 0,
+            "details.p09_description2": 0,
+            "details.p13_Bestseller": 0,
+            "details.p14_reviews": 0,
+            "details.p15_QuestionReponses": 0,
+            "details.p16_ImageURL": 0
            }
         }
       ];
-
+      // important to have cursor: { batchSize: 0 } otherwise the API endpoint (browser) may restart the query every 30seconds or so => infinte run
       let processor = db.collection(req.params.collection)
       .aggregate(
         pipeline,
