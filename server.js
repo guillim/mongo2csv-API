@@ -1,5 +1,6 @@
 const express        = require('express');
 const MongoClient    = require('mongodb').MongoClient;
+const Pool = require("pg").Pool;
 const bodyParser     = require('body-parser');
 const db             = require('./config/db');
 
@@ -16,7 +17,21 @@ app.listen(port, () => {
 // Unfortunately, Express can’t process "x-www-form-urlencoded" post form on its own. body-parser package helps fot that [needs to be before  routes definition]
 app.use(bodyParser.urlencoded({ extended: true }));
 
+if (/postgres/g.test(db.url)) {
+  const pool = new Pool({  connectionString: db.url  });
 
+  pool.connect((err, client, done) => {
+    if (err) {
+      app.get('/status', (req, res) => {
+        res.send('Not connected to the database')
+      });
+      console.log(err)
+    }else{
+        require('./app/routes_postgres')(app, client, done);
+    }
+  })
+
+} else {
 
 // Set up the database, and everything from here
 MongoClient.connect(db.url, (err, database) => {
@@ -32,3 +47,4 @@ MongoClient.connect(db.url, (err, database) => {
     require('./app/routes')(app, database.db(db.databasename));
   }
 })
+}
